@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f4f0e6">
+<title>你最像《后会友期》里的谁？</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --main:#8b6f5e;
+  --accent:#b8956a;
+  --bg:#f4f0e6;
+  --ink:#2f2b28;
+  --ink2:#7b736c;
+  --line:#e6dfd1;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(139,111,94,.10), transparent 42%),
+    radial-gradient(circle at 92% 88%, rgba(184,149,106,.12), transparent 42%);
+  background-attachment:fixed;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:500px;margin:0 auto;padding:40px 20px 60px}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.cover{text-align:center;padding-top:44px}
+.badge{display:inline-block;font-size:12px;font-weight:600;color:var(--main);
+  background:#f0e8dc;border:1px solid #e0d4c0;padding:7px 16px;border-radius:999px;
+  letter-spacing:.5px;margin-bottom:24px}
+h1{font-size:30px;line-height:1.4;letter-spacing:-.5px;font-weight:800}
+.grad{background:linear-gradient(100deg,#8b6f5e,#b8956a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cover-sub{font-size:14px;color:var(--ink2);line-height:2;margin:18px 0 34px}
+.btn{
+  width:100%;border:none;cursor:pointer;font-family:inherit;
+  font-size:16px;font-weight:700;color:#fff;padding:17px;border-radius:14px;
+  background:linear-gradient(100deg,#a0826e,#8b6f5e);
+  box-shadow:0 14px 28px -12px rgba(139,111,94,.55);
+  transition:transform .15s ease;
+}
+.btn:active{transform:scale(.97)}
+.tiny{font-size:11.5px;color:#a89fb3;margin-top:22px;line-height:1.8}
+
+.quiz-top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.back-btn{
+  width:34px;height:34px;flex:0 0 auto;border-radius:50%;
+  border:1px solid var(--line);background:#fff;color:var(--ink2);
+  font-size:19px;line-height:1;cursor:pointer;font-family:inherit;
+  transition:opacity .2s;
+}
+.back-btn:disabled{opacity:.3;cursor:default}
+.progress{flex:1;height:6px;background:#e8e2d6;border-radius:999px;overflow:hidden}
+.progress-in{height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,#b8956a,#8b6f5e);
+  transition:width .3s ease}
+.counter{flex:0 0 auto;font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;font-weight:600}
+.q-card{
+  background:#fff;border-radius:20px;padding:26px 22px;
+  box-shadow:0 16px 36px -22px rgba(90,70,50,.22);
+  border:1px solid rgba(255,255,255,.8);
+}
+.q-num{font-size:12px;font-weight:800;color:var(--main);letter-spacing:1.5px;margin-bottom:12px}
+.q-title{font-size:18px;line-height:1.65;font-weight:700;margin-bottom:20px}
+.opt{
+  display:block;width:100%;text-align:left;font-family:inherit;
+  font-size:14.5px;line-height:1.6;color:var(--ink);
+  padding:15px 18px;border-radius:12px;
+  border:1.5px solid var(--line);background:#fbfaf8;
+  margin-bottom:12px;cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.opt:hover{border-color:#d8ccb8;background:#fff}
+.opt.sel{border-color:var(--main);background:#faf6f0}
+
+.result-card{
+  background:#fff;border-radius:22px;padding:32px 24px 26px;
+  box-shadow:0 16px 36px -22px rgba(90,70,50,.22);
+  border:1px solid rgba(255,255,255,.8);
+  text-align:center;
+}
+.r-emoji{font-size:58px;line-height:1;margin-bottom:10px}
+.r-tag{
+  display:inline-block;font-size:12px;font-weight:600;color:#6b7d5e;
+  background:#eef2e9;padding:6px 14px;border-radius:999px;margin:10px 0 12px;
+}
+.r-name{font-size:26px;font-weight:800;letter-spacing:-.3px;color:var(--main)}
+.r-desc{font-size:14.5px;line-height:1.9;color:#555;text-align:left;margin-top:18px}
+.block{text-align:left;margin-top:26px}
+.block h3{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.block h3::before{content:"";width:4px;height:14px;border-radius:2px;
+  background:linear-gradient(180deg,var(--main),#b8956a)}
+.quote-box{
+  text-align:left;margin-top:20px;padding:18px;border-radius:12px;
+  background:#faf7f1;border-left:4px solid var(--main);font-size:14px;line-height:1.85;color:#666;font-style:italic;
+}
+.match-box{
+  text-align:left;margin-top:16px;padding:16px;border-radius:12px;
+  font-size:14px;line-height:1.8;color:#555;background:#f3f5f0;
+}
+.match-box b{display:block;font-size:12.5px;color:#55644c;margin-bottom:6px}
+
+.bars{margin-top:10px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar-name{flex:0 0 82px;font-size:12.5px;color:#555;font-weight:600;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:8px;background:#f0ebe1;border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:999px;
+  background:linear-gradient(90deg,#c9a97e,#8b6f5e);
+  transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar-row:first-child .bar-fill{background:linear-gradient(90deg,#9aaa8a,#6b7d5e)}
+
+.actions{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.btn-ghost{
+  width:100%;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;
+  padding:15px;border-radius:14px;color:var(--ink2);
+  background:#fff;border:1.5px solid var(--line);transition:transform .15s;
+}
+.btn-ghost:active{transform:scale(.97)}
+.disclaimer{font-size:11.5px;color:#a89fb3;line-height:1.9;text-align:center;margin-top:22px}
+
+.toast{
+  position:fixed;left:50%;bottom:40px;transform:translate(-50%,20px);
+  background:rgba(47,43,40,.92);color:#fff;font-size:13px;
+  padding:11px 22px;border-radius:999px;opacity:0;pointer-events:none;
+  transition:opacity .25s,transform .25s;z-index:99;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="screen-cover" class="screen active">
+    <div class="cover">
+      <div class="badge">24 题 · 旧友人格鉴定</div>
+      <h1>你最像《后会友期》<br><span class="grad">里的谁？</span></h1>
+      <p class="cover-sub">马天宇、张萌、许飞、厉娜、白小纯、青稚……<br>凭第一直觉选择，不要想太久</p>
+      <button class="btn" id="startBtn">开始测试</button>
+      <p class="tiny">结果仅供娱乐，致敬每一段走散又重逢的友情</p>
+    </div>
+  </section>
+
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-top">
+      <button class="back-btn" id="backBtn" aria-label="上一题">‹</button>
+      <div class="progress"><div class="progress-in" id="progressIn"></div></div>
+      <div class="counter" id="counter">1 / 24</div>
+    </div>
+    <div class="q-card">
+      <div class="q-num" id="qNum">Q1</div>
+      <h2 class="q-title" id="qTitle"></h2>
+      <div id="options"></div>
+    </div>
+  </section>
+
+  <section id="screen-result" class="screen">
+    <div class="result-card">
+      <div class="r-emoji" id="rEmoji"></div>
+      <div class="r-tag" id="rTag"></div>
+      <h2 class="r-name" id="rName"></h2>
+      <p class="r-desc" id="rDesc"></p>
+
+      <div class="block">
+        <h3>你的旧友人格底色</h3>
+        <div class="quote-box" id="rQuote"></div>
+      </div>
+
+      <div class="match-box" id="rMatch"></div>
+
+      <div class="block">
+        <h3>旧友基因图谱</h3>
+        <div class="bars" id="rBars"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="copyBtn">复制分享文案</button>
+        <button class="btn-ghost" id="againBtn">再测一次</button>
+      </div>
+    </div>
+    <p class="disclaimer">测试仅供娱乐，不具任何专业诊断性。<br>“终点未至，后会友期。”</p>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TYPES = {
+  M: {
+    name: '马天宇', emoji: '🧊', tag: '体面到极致的反向刺猬',
+    desc: '你看起来温和、周到，社交场合里总能让人舒服。但你的内心有一道极其清晰的线——一旦有人越界，你不会吵，不会闹，你会安静地、彻底地把这个人从你的世界里删掉。你不是记仇，你只是太清楚：不舒服的关系，不值得勉强。',
+    quote: '“我介意的是那句话本身。朋友之间，最基本的是尊重。”',
+    match: '<b>最容易和你走散的人：张萌 🔥</b><br>她以为一句气话过去了就过去了，你以为那句话就是全部答案。'
+  },
+  Z: {
+    name: '张萌', emoji: '🔥', tag: '热烈通透的破冰者',
+    desc: '你是那种“爱就爱了，气就气了”的人。脾气来得快也去得快，从不内耗。你重情重义，愿意主动低头、主动破冰，因为你相信一段值得的关系比面子重要。但有时候，你的热烈在对方眼里，可能是一道太亮的光。',
+    quote: '“我当年说话太绝对了，不懂朋友间的分寸感。”',
+    match: '<b>最容易和你走散的人：马天宇 🧊</b><br>你用热度靠近，他用沉默退后。不是不爱，是节奏不同。'
+  },
+  X: {
+    name: '许飞', emoji: '🪨', tag: '嘴硬心软的画地为牢者',
+    desc: '你说话直，棱角硬，看起来什么都不在乎。但你心里有一个位置，留给了一段走不出去的关系。你反复咀嚼，反复回头，嘴上说着“算了”，心里却从未真正放过自己。你的柔软藏得很深，深到连你自己都不太愿意承认。',
+    quote: '“我画地为牢啊，厉娜。”',
+    match: '<b>你最放不下的人：厉娜 🌙</b><br>她是你的句号，而你把她当成了每一句话的结尾。'
+  },
+  L: {
+    name: '厉娜', emoji: '🌙', tag: '清醒自持的体面退场者',
+    desc: '你不抢话，不追问，不纠缠。你有一种安静的骄傲：我可以爱你，但我不会求你。你爱就爱全部，恨也恨得干脆。别人觉得你冷漠，其实你只是把所有的波澜都收在了水面之下。你的体面，是你给自己最后的铠甲。',
+    quote: '“有些关系，不下车就是答案。”',
+    match: '<b>你最意难平的人：许飞 🪨</b><br>她画地为牢，而你早已学会了不回头。'
+  },
+  B: {
+    name: '白小纯', emoji: '🌶️', tag: '嘴臭心软的炸毛小孩',
+    desc: '你情绪全写在脸上，嘴上绝不认输，但心里比谁都在意。你看起来冲、看起来刺，其实你只是不知道怎么好好表达“我需要你”。真正在乎的人有事，你骂骂咧咧地第一个冲上去。你的刺是防御，你的心是软的。',
+    quote: '“我嘴上骂你，但我从来没真的走。”',
+    match: '<b>你最拧巴的人：青稚 🧭</b><br>他越稳，你越炸。你炸，是因为你怕他不在乎。'
+  },
+  Q: {
+    name: '青稚', emoji: '🧭', tag: '温柔坦荡的稳定锚点',
+    desc: '你不太容易被激怒，也不太爱解释。别人冲你发火，你看着，听着，不记恨。你对事不对人，习惯用“事情该怎么解决”来代替“谁对谁错”。你看起来好脾气，其实你只是把情绪的能量省下来，用在了真正重要的地方。',
+    quote: '“他冷脸，我接着。没什么好回怼的。”',
+    match: '<b>最让你头疼的人：白小纯 🌶️</b><br>他炸的时候你稳着，但你知道，他炸是因为他在乎。'
+  },
+  W: {
+    name: '王子璇', emoji: '🕯️', tag: '细腻纯粹的渴望被偏爱者',
+    desc: '你不擅长表达，但你的感受极其细腻。你太在乎自己在对方心里是不是“特别的那一个”。如果一段友情里你觉得自己被放在了普通的位置，你不会说，但你会慢慢缩回去。你要的从来不是很多人，而是一个确定。',
+    quote: '“我怕的是，我对你来说，跟别人没什么不一样。”',
+    match: '<b>最能让你安心的人：张萌 🔥</b><br>她看得懂你的退缩，也愿意替你把那句话说出来。'
+  },
+  J: {
+    name: '文吉儿', emoji: '📖', tag: '敏感骄傲的表达者',
+    desc: '你有自己的世界，文字、感受、仪式感，对你来说都很重要。你在意细节，在意“你有没有记得”。当你感到被忽略时，你不会大吵，但你会用沉默和距离让对方知道。你的骄傲不允许你伸手，但你的心里一直在等对方先开口。',
+    quote: '“有些话我不说，不代表我不在意。”',
+    match: '<b>最懂你沉默的人：王子璇 🕯️</b><br>你们都在等对方先伸手，也都在等一个“你是特别的”。'
+  }
+};
+
+const QUESTIONS = [
+  { q: '和一位多年好友因为一句话断联了，你更可能是——', options: [
+    { text: '算了，不联系就不联系吧。但这句话我记一辈子。', type: 'M' },
+    { text: '过一阵子主动发消息：出来吃饭，我请。', type: 'Z' },
+    { text: '反复想，反复写，反复删。最后什么都没发。', type: 'X' },
+    { text: '你找我就聊，你不找我，我也不会找你。', type: 'L' }
+  ]},
+  { q: '朋友在众人面前开了你一句让你不舒服的玩笑，你会——', options: [
+    { text: '当场怼回去，声音比TA还大', type: 'B' },
+    { text: '笑一下，不接话。之后默默和这个人保持距离', type: 'M' },
+    { text: '当场不发作，回头私聊：下次别这样了', type: 'Q' },
+    { text: '表面没事，心里一直过不去，好几天都在想', type: 'W' }
+  ]},
+  { q: '一段友情里，你最害怕的是——', options: [
+    { text: '对方不尊重我的底线', type: 'M' },
+    { text: '我付出了很多，对方根本没当回事', type: 'Z' },
+    { text: '我还在原地，对方早就走远了', type: 'X' },
+    { text: '我对TA来说，跟别人没什么两样', type: 'W' }
+  ]},
+  { q: '你难过的时候，更倾向于——', options: [
+    { text: '一个人待着，谁也别来', type: 'M' },
+    { text: '把朋友叫出来，吃顿好的，边吃边说', type: 'Z' },
+    { text: '写东西，或者反复听一首歌', type: 'J' },
+    { text: '骂骂咧咧地找人吐槽，骂完就好一半', type: 'B' }
+  ]},
+  { q: '朋友做了一件让你很失望的事，你的第一反应是——', options: [
+    { text: '直接说：你这次让我挺失望的', type: 'Q' },
+    { text: '冷着脸，不说话，让TA自己感觉', type: 'L' },
+    { text: '炸了，把不满全倒出来', type: 'B' },
+    { text: '不吵，但从此这个人在我心里降级了', type: 'M' }
+  ]},
+  { q: '如果“和解”需要一个人先低头，你通常是——', options: [
+    { text: '低就低吧，我舍不得这段关系', type: 'Z' },
+    { text: '看情况。如果对方值得，我可以', type: 'Q' },
+    { text: '我不会先低头。但我一直在等TA来找我', type: 'X' },
+    { text: '低不低头不重要，重要的是TA有没有真的懂我为什么难过', type: 'W' }
+  ]},
+  { q: '你更容易被哪种人吸引成为朋友？', options: [
+    { text: '热烈、直接、不藏着掖着的人', type: 'L' },
+    { text: '情绪稳定、让人安心的人', type: 'B' },
+    { text: '有才华、有自己的世界的人', type: 'W' },
+    { text: '有趣、能接住我梗的人', type: 'Q' }
+  ]},
+  { q: '别人评价你“想太多”，你的反应是——', options: [
+    { text: '我不是想太多，是你们想太少', type: 'J' },
+    { text: '可能吧。但我控制不住', type: 'W' },
+    { text: '想太多？我根本没空想，我忙着生气', type: 'B' },
+    { text: '不解释。想多少是我自己的事', type: 'L' }
+  ]},
+  { q: '你对于“旧友重逢”这件事的态度是——', options: [
+    { text: '能重逢当然好，但我不强求', type: 'Q' },
+    { text: '我心里有一个名单，一直在等他们回来', type: 'X' },
+    { text: '过去的就过去了，我不太回头看', type: 'L' },
+    { text: '如果重逢，我希望是TA先开口', type: 'W' }
+  ]},
+  { q: '在一群人里，你通常是——', options: [
+    { text: '负责热场、接话、照顾所有人情绪的那个', type: 'Z' },
+    { text: '话不多，但谁跟谁不对劲，我全看在眼里', type: 'M' },
+    { text: '负责怼人、吐槽、把气氛搞起来', type: 'B' },
+    { text: '不抢话，偶尔说一句，但说得很准', type: 'Q' }
+  ]},
+  { q: '你最不能接受朋友对你做的一件事是——', options: [
+    { text: '用命令或警告的语气跟我说话', type: 'M' },
+    { text: '在别人面前否定我、让我难堪', type: 'W' },
+    { text: '我发了很长一段真心话，TA只回了一个“嗯”', type: 'J' },
+    { text: '明明是我先被伤害，TA却觉得我小题大做', type: 'X' }
+  ]},
+  { q: '如果给十年前的一位朋友发一条消息，你会发——', options: [
+    { text: '“当年那件事，我想听你说清楚。”', type: 'X' },
+    { text: '“好久不见，最近好吗？”', type: 'Q' },
+    { text: '“我想你了，出来吃饭。”', type: 'Z' },
+    { text: '什么都不发。如果TA想找我，TA会找的。', type: 'L' }
+  ]},
+  { q: '你生气的时候，最典型的反应是——', options: [
+    { text: '音量升高，语速加快，先骂了再说', type: 'B' },
+    { text: '沉默，冷战，不接电话不回消息', type: 'M' },
+    { text: '冷笑，说一句很扎心的话，然后走开', type: 'L' },
+    { text: '不发作，但接下来几天整个人都是低气压', type: 'J' }
+  ]},
+  { q: '你心里最柔软的地方，通常留给——', options: [
+    { text: '那个我嘴上骂了一万遍、但别人说一句都不行的人', type: 'B' },
+    { text: '那个我明明已经放下了、但梦里还会出现的人', type: 'X' },
+    { text: '那个让我觉得“我在TA心里是特别的”的人', type: 'W' },
+    { text: '那个我主动走了九十九步、TA终于迈出一步的人', type: 'Z' }
+  ]},
+  { q: '朋友情绪崩溃大哭，你更可能——', options: [
+    { text: '递纸巾，坐在旁边，等TA哭完', type: 'Q' },
+    { text: '抱住TA，说“我在呢”', type: 'Z' },
+    { text: '心里很心疼，但嘴上说：哭什么，至于吗？', type: 'B' },
+    { text: '不知道该说什么，但会一直陪着', type: 'W' }
+  ]},
+  { q: '你更认同哪句话？', options: [
+    { text: '“朋友之间，尊重比亲密更重要。”', type: 'M' },
+    { text: '“一段关系里，先认真的人先输。”', type: 'L' },
+    { text: '“我放不下的不是TA，是当年的我自己。”', type: 'X' },
+    { text: '“我要的从来不多，只是一个确定。”', type: 'W' }
+  ]},
+  { q: '如果一段友情让你一直内耗，你会——', options: [
+    { text: '直接摊牌，说清楚，能处就处，不能处拉倒', type: 'Q' },
+    { text: '慢慢淡出，不解释，不回头', type: 'L' },
+    { text: '一边内耗一边继续，因为我舍不得', type: 'Z' },
+    { text: '写很长的话，但最后可能一个字都不发出去', type: 'J' }
+  ]},
+  { q: '你最容易在哪种时刻“破防”？', options: [
+    { text: '对方说“你对我来说是特别的”', type: 'W' },
+    { text: '对方说“我一直都在”', type: 'Z' },
+    { text: '对方说“我懂你”', type: 'Q' },
+    { text: '对方什么都没说，但做了一件小事', type: 'M' }
+  ]},
+  { q: '别人觉得你“不好惹”，你觉得——', options: [
+    { text: '对啊，所以别惹我', type: 'L' },
+    { text: '我只是看起来凶，其实心软得要命', type: 'B' },
+    { text: '我不在乎别人怎么觉得', type: 'M' },
+    { text: '我不好惹，是因为我太容易被伤到', type: 'X' }
+  ]},
+  { q: '你如何看待“友情里的占有欲”？', options: [
+    { text: '很正常。我在意的人，我希望我也是TA在意的', type: 'W' },
+    { text: '我不太有。人来人往，正常', type: 'L' },
+    { text: '我有，但我不会说。说了就输了', type: 'J' },
+    { text: '我对朋友没什么占有欲，但TA要是背叛我，我会很彻底', type: 'M' }
+  ]},
+  { q: '你最像朋友眼中的哪种角色？', options: [
+    { text: '那个看起来最凶、其实最护短的人', type: 'B' },
+    { text: '那个最靠谱、情绪最稳的人', type: 'Q' },
+    { text: '那个最会热场、最会主动的人', type: 'Z' },
+    { text: '那个话最少、但心里什么都清楚的人', type: 'L' }
+  ]},
+  { q: '你对于“画地为牢”这个词的感受是——', options: [
+    { text: '太懂了。我就是那个把自己关在里面的人', type: 'X' },
+    { text: '我不会。我关了门就会把钥匙扔掉', type: 'L' },
+    { text: '我关过，但后来我自己走出来了', type: 'Z' },
+    { text: '我关的不是牢，是我给自己的安全区', type: 'M' }
+  ]},
+  { q: '如果测出你像某个人，你最希望别人说你像——', options: [
+    { text: '“你像马天宇，体面，有边界。”', type: 'M' },
+    { text: '“你像张萌，热烈，通透。”', type: 'Z' },
+    { text: '“你像许飞，嘴硬，但心里全是柔软。”', type: 'X' },
+    { text: '“你像厉娜，清醒，体面，不纠缠。”', type: 'L' }
+  ]},
+  { q: '最后一题：此刻，你心里有没有一个“后会友期”的人？', options: [
+    { text: '有。但我可能不会告诉TA', type: 'X' },
+    { text: '有。如果TA现在找我，我会回', type: 'Z' },
+    { text: '有过，已经翻篇了', type: 'L' },
+    { text: '我一直在等TA先开口', type: 'W' }
+  ]}
+];
+
+let current = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let scores = {};
+let currentResult = null;
+
+const $ = s => document.querySelector(s);
+function show(id){
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  $('#' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+}
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function startQuiz(){
+  answers.fill(null);
+  current = 0;
+  scores = { M: 0, Z: 0, X: 0, L: 0, B: 0, Q: 0, W: 0, J: 0 };
+  renderQuestion();
+  show('screen-quiz');
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  $('#qNum').textContent = 'Q' + (current + 1);
+  $('#qTitle').textContent = q.q;
+  $('#counter').textContent = (current + 1) + ' / ' + QUESTIONS.length;
+  $('#progressIn').style.width = ((current + 1) / QUESTIONS.length * 100) + '%';
+  $('#backBtn').disabled = current === 0;
+
+  const box = $('#options');
+  box.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (answers[current] === idx ? ' sel' : '');
+    btn.type = 'button';
+    btn.textContent = opt.text;
+    btn.onclick = () => pick(idx);
+    box.appendChild(btn);
+  });
+
+  const card = box.parentElement;
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'fadeUp .35s ease both';
+}
+
+function pick(choice){
+  const opts = document.querySelectorAll('.opt');
+  if (opts[choice].classList.contains('sel')) return;
+  answers[current] = choice;
+  opts.forEach(o => o.classList.remove('sel'));
+  opts[choice].classList.add('sel');
+  setTimeout(() => {
+    if (current < QUESTIONS.length - 1){ current++; renderQuestion(); }
+    else { renderResult(); }
+  }, 240);
+}
+
+function goBack(){ if (current === 0) return; current--; renderQuestion(); }
+
+function calcResult(){
+  scores = { M: 0, Z: 0, X: 0, L: 0, B: 0, Q: 0, W: 0, J: 0 };
+  answers.forEach((ansIdx, qIdx) => {
+    if (ansIdx !== null) {
+      const type = QUESTIONS[qIdx].options[ansIdx].type;
+      scores[type] = (scores[type] || 0) + 1;
+    }
+  });
+  let best = 'M', max = -1;
+  for (const key in scores) { if (scores[key] > max){ max = scores[key]; best = key; } }
+  return best;
+}
+
+function renderResult(){
+  const bestKey = calcResult();
+  currentResult = bestKey;
+  const t = TYPES[bestKey];
+  $('#rEmoji').textContent = t.emoji;
+  $('#rTag').textContent = t.tag;
+  $('#rName').textContent = t.name;
+  $('#rDesc').textContent = t.desc;
+  $('#rQuote').innerHTML = t.quote;
+  $('#rMatch').innerHTML = t.match;
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const maxScore = sorted[0][1] || 1;
+  const barsEl = $('#rBars');
+  barsEl.innerHTML = '';
+  sorted.forEach(([k, v]) => {
+    const pct = 12 + (v / maxScore) * 88;
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML =
+      '<span class="bar-name">' + TYPES[k].name + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:0"></div></div>';
+    barsEl.appendChild(row);
+    requestAnimationFrame(() => {
+      row.querySelector('.bar-fill').style.width = pct.toFixed(1) + '%';
+    });
+  });
+
+  show('screen-result');
+}
+
+function copyShare(){
+  if (!currentResult) return;
+  const t = TYPES[currentResult];
+  const text = '在《后会友期》旧友人格测试里，我最像「' + t.name + '」' + t.emoji + '——' + t.tag + '。\n你是旧友里的谁？来测测看吧。\n“终点未至，后会友期。”';
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => toast('已复制，去粘贴吧')).catch(fallback);
+  } else { fallback(); }
+  function fallback(){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('已复制，去粘贴吧'); }
+    catch (e) { toast('复制失败，请长按选择'); }
+    document.body.removeChild(ta);
+  }
+}
+
+$('#startBtn').addEventListener('click', startQuiz);
+$('#backBtn').addEventListener('click', goBack);
+$('#againBtn').addEventListener('click', startQuiz);
+$('#copyBtn').addEventListener('click', copyShare);
+</script>
+</body>
+</html>
